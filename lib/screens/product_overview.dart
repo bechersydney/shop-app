@@ -29,6 +29,7 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
     // final cartContainer = Provider.of<CartProvider>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
+        iconTheme: const IconThemeData(color: Colors.purple),
         title: const Text('Product Overview'),
         actions: [
           Consumer<CartProvider>(

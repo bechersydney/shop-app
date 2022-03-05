@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shop_app/screens/orders.dart';
+import 'package:shop_app/screens/user_products_screen.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({Key? key}) : super(key: key);
@@ -39,6 +40,12 @@ class AppDrawer extends StatelessWidget {
           _buildListTile('Orders', Icons.payment, () {
             Navigator.of(context).pushReplacementNamed(OrdersScreen.routeName);
           }, context),
+          const Divider(),
+          _buildListTile('Manage Product', Icons.settings, () {
+            Navigator.of(context)
+                .pushReplacementNamed(UserProductScreen.routeName);
+          }, context),
+          const Divider(),
         ],
       ),
     );

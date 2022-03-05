@@ -63,10 +63,27 @@ class ProductItem extends StatelessWidget {
         trailing: _buildIcon(
           const Icon(Icons.shopping_cart),
           () {
-            _cartContainer.addItem(
+            _cartContainer
+                .addItem(
               _product.id,
               _product.price,
               _product.title,
+            )
+                .then(
+              (value) {
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text('Item Added'),
+                    action: SnackBarAction(
+                      label: 'Undo',
+                      onPressed: () {
+                        _cartContainer.removeSingleItem(_product.id);
+                      },
+                    ),
+                  ),
+                );
+              },
             );
           },
           context,
