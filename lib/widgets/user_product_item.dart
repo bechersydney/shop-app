@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shop_app/models/providers/product.dart';
+import 'package:shop_app/models/providers/products.dart';
 import 'package:shop_app/screens/edit_product.dart';
 
 class UserProductItem extends StatelessWidget {
@@ -67,7 +69,11 @@ class UserProductItem extends StatelessWidget {
                               ),
                               TextButton(
                                 onPressed: () {
-                                  Navigator.of(context).pop(true);
+                                  Provider.of<ProductsProvider>(context,
+                                          listen: false)
+                                      .deleteProductById(_product.id)
+                                      .then((value) =>
+                                          Navigator.of(context).pop());
                                 },
                                 child: const Text(
                                   'YES',
