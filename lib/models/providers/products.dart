@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shop_app/models/data/products.dart';
 import 'product.dart';
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
 
 class ProductsProvider with ChangeNotifier {
   final List<Product> _items = dummyProducts;
@@ -21,15 +24,33 @@ class ProductsProvider with ChangeNotifier {
   }
 
   Future<void> addProduct(Product _product) async {
-    final _newProduct = Product(
-      id: DateTime.now().toString(),
-      title: _product.title,
-      price: _product.price,
-      description: _product.description,
-      imageUrl: _product.imageUrl,
-    );
-    _items.insert(0, _newProduct);
-    notifyListeners();
+    final url =
+        Uri.parse('https://shop-app-220d9-default-rtdb.firebaseio.com/product');
+    try {
+      final response = await http.post(
+        url,
+        body: json.encode(
+          {
+            'title': _product.title,
+            'pricce': _product.price,
+            'description': _product.description,
+            'imageUrl': _product.imageUrl,
+            'isFavorite': _product.isFavorite,
+          },
+        ),
+      );
+      final _newProduct = Product(
+        id: json.decode(response.body)['name'],
+        title: _product.title,
+        price: _product.price,
+        description: _product.description,
+        imageUrl: _product.imageUrl,
+      );
+      _items.add(_newProduct);
+      notifyListeners();
+    } catch (err) {
+      throw err;
+    }
   }
 
   // void showFavoritesOnly() {
