@@ -45,21 +45,7 @@ class CartScreen extends StatelessWidget {
                     ),
                     backgroundColor: Theme.of(context).colorScheme.primary,
                   ),
-                  TextButton(
-                    onPressed: () async {
-                      Provider.of<OrdersProvider>(
-                        context,
-                        listen: false,
-                      ).addOrder(
-                        cartContainer.items.values.toList(),
-                        cartContainer.getTotal,
-                      );
-                      cartContainer.clear();
-                      await Navigator.of(context)
-                          .pushNamed(OrdersScreen.routeName);
-                    },
-                    child: const Text('ORDER NOW'),
-                  ),
+                  OrderButton(cartContainer: cartContainer),
                 ],
               ),
             ),
@@ -78,6 +64,53 @@ class CartScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class OrderButton extends StatefulWidget {
+  const OrderButton({
+    Key? key,
+    required this.cartContainer,
+  }) : super(key: key);
+
+  final CartProvider cartContainer;
+
+  @override
+  State<OrderButton> createState() => _OrderButtonState();
+}
+
+class _OrderButtonState extends State<OrderButton> {
+  bool _isLoading = false;
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      onPressed: (widget.cartContainer.getTotal <= 0 || _isLoading)
+          ? null
+          : () async {
+              setState(() {
+                _isLoading = true;
+              });
+              await Provider.of<OrdersProvider>(
+                context,
+                listen: false,
+              ).addOrder(
+                widget.cartContainer.items.values.toList(),
+                widget.cartContainer.getTotal,
+              );
+              setState(() {
+                _isLoading = false;
+              });
+              widget.cartContainer.clear();
+              Navigator.of(context).pushNamed(OrdersScreen.routeName);
+            },
+      child:
+      
+       _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : const Text('ORDER NOW'),
     );
   }
 }

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:shop_app/models/data/products.dart';
+import 'package:shop_app/models/http_exception.dart';
 import 'product.dart';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
 class ProductsProvider with ChangeNotifier {
-  final List<Product> _items = dummyProducts;
+  List<Product> _items = [];
 
   List<Product> get getProducts {
     // if (_showFavoritesOnly) {
@@ -24,15 +24,16 @@ class ProductsProvider with ChangeNotifier {
   }
 
   Future<void> addProduct(Product _product) async {
-    final url =
-        Uri.parse('https://shop-app-220d9-default-rtdb.firebaseio.com/product');
+    const _url =
+        'https://shop-app-220d9-default-rtdb.firebaseio.com/product.json';
+    final url = Uri.parse(_url);
     try {
       final response = await http.post(
         url,
         body: json.encode(
           {
             'title': _product.title,
-            'pricce': _product.price,
+            'price': _product.price,
             'description': _product.description,
             'imageUrl': _product.imageUrl,
             'isFavorite': _product.isFavorite,
@@ -65,12 +66,69 @@ class ProductsProvider with ChangeNotifier {
 
   Future<void> updateProductById(String id, Product _newProduct) async {
     final _productIndex = _items.indexWhere((prod) => prod.id == id);
+
+    final updateUrl = Uri.parse(
+        'https://shop-app-220d9-default-rtdb.firebaseio.com/product/$id.json');
+    try {
+      await http.patch(
+        updateUrl,
+        body: json.encode(
+          {
+            'title': _newProduct.title,
+            'description': _newProduct.description,
+            'price': _newProduct.price,
+            'imageUrl': _newProduct.imageUrl,
+          },
+        ),
+      );
+    } catch (err) {
+      print(err);
+    }
     _items[_productIndex] = _newProduct;
     notifyListeners();
   }
 
   Future<void> deleteProductById(String id) async {
     _items.removeWhere((product) => product.id == id);
+    final deleteUrl = Uri.parse(
+        'https://shop-app-220d9-default-rtdb.firebaseio.com/product/$id.json');
+    try {
+      final response = await http.delete(deleteUrl);
+      if (response.statusCode >= 400) {
+        throw const HttpException('Could not delete product');
+      }
+    } catch (err) {
+      print(err);
+    }
     notifyListeners();
+  }
+
+  Future<void> fetchAndSetProducts() async {
+    const _url =
+        'https://shop-app-220d9-default-rtdb.firebaseio.com/product.json';
+    final url = Uri.parse(_url);
+    try {
+      final response = await http.get(url);
+      print(json.decode(response.body));
+      final extractedData = json.decode(response.body) as Map<String, dynamic>;
+      final List<Product> loadededProduct = [];
+      extractedData.forEach((prodId, product) {
+        loadededProduct.add(
+          Product(
+            id: prodId,
+            description: product['description'],
+            imageUrl: product['imageUrl'],
+            price: product['price'],
+            title: product['title'],
+            isFavorite: product['isFavorite'],
+          ),
+        );
+      });
+      _items = loadededProduct;
+      notifyListeners();
+    } catch (err) {
+      // ignore: avoid_print
+      print(err);
+    }
   }
 }

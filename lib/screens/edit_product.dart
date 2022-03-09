@@ -33,7 +33,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     'imageURL': ''
   };
 
-  void _saveForm() {
+  void _saveForm() async {
     final _isFormValid = _form.currentState!.validate();
     if (!_isFormValid) return;
     _form.currentState!.save();
@@ -41,44 +41,33 @@ class _EditProductScreenState extends State<EditProductScreen> {
       _isLoading = true;
     });
     if (_editedProduct.id.isEmpty) {
-      Provider.of<ProductsProvider>(context, listen: false)
-          .addProduct(_editedProduct)
-          .catchError(
-        (err) {
-          return showDialog(
-            context: context,
-            builder: (ctx) => AlertDialog(
-              title: const Text('An error occured'),
-              content: const Text('Something went wrong'),
-              actions: [
-                TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: const Text('Okay'))
-              ],
-            ),
-          );
-        },
-      ).then(
-        (value) {
-          setState(() {
-            _isLoading = false;
-          });
-          Navigator.of(context).pop();
-        },
-      );
+      try {
+        await Provider.of<ProductsProvider>(context, listen: false)
+            .addProduct(_editedProduct);
+      } catch (error) {
+        await showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text('An error occured'),
+            content: const Text('Something went wrong'),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Okay'))
+            ],
+          ),
+        );
+      }
     } else {
-      Provider.of<ProductsProvider>(context, listen: false)
-          .updateProductById(_editedProduct.id, _editedProduct)
-          .then(
-        (value) {
-          setState(() {
-            _isLoading = false;
-          });
-        },
-      );
+      await Provider.of<ProductsProvider>(context, listen: false)
+          .updateProductById(_editedProduct.id, _editedProduct);
     }
+    setState(() {
+      _isLoading = false;
+    });
+    Navigator.of(context).pop();
   }
 
   void _updateImageUrl() {
@@ -103,7 +92,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     super.didChangeDependencies();
 
     if (_isInit) {
-      final _productId = ModalRoute.of(context)?.settings.arguments as String;
+      final _productId = ModalRoute.of(context)!.settings.arguments as String;
       if (_productId.isNotEmpty) {
         _editedProduct =
             Provider.of<ProductsProvider>(context).getProductById(_productId);
@@ -111,7 +100,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
           'title': _editedProduct.title,
           'price': _editedProduct.price.toString(),
           'description': _editedProduct.description,
-          // 'imageURL': _editedProduct.imageUrl, // you can't use controller and initial value at the same time
+          'imageURL': _editedProduct
+              .imageUrl, // you can't use controller and initial value at the same time
         };
         _imageURLController.text = _editedProduct.imageUrl;
       }

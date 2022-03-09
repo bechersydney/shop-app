@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shop_app/models/providers/cart.dart';
+import 'package:shop_app/models/providers/product.dart';
+import 'package:shop_app/models/providers/products.dart';
 import 'package:shop_app/screens/cart.dart';
 import 'package:shop_app/widgets/app_drawer.dart';
 import 'package:shop_app/widgets/badge.dart';
@@ -24,9 +26,6 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
   bool _isShowFavorites = false;
   @override
   Widget build(BuildContext context) {
-    // final productContainer =
-    //     Provider.of<ProductsProvider>(context, listen: false);
-    // final cartContainer = Provider.of<CartProvider>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Colors.purple),
@@ -69,7 +68,24 @@ class _ProductOverviewScreenState extends State<ProductOverviewScreen> {
         ],
       ),
       drawer: const AppDrawer(),
-      body: ProductGrid(_isShowFavorites),
+      body: FutureBuilder(
+        future: Provider.of<ProductsProvider>(context, listen: false)
+            .fetchAndSetProducts(),
+        builder: (ctx, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.hasError) {
+              return const Center(
+                child: Text('An error occured'),
+              );
+            }
+            return ProductGrid(_isShowFavorites);
+          } else {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        },
+      ),
     );
   }
 }
