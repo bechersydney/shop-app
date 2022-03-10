@@ -16,6 +16,7 @@ enum FilterOptions {
 }
 
 class ProductOverviewScreen extends StatefulWidget {
+  static const String routeName = '/product-screen';
   const ProductOverviewScreen({Key? key}) : super(key: key);
 
   @override
