@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shop_app/models/providers/auth.dart';
+import 'package:shop_app/screens/auth_screen.dart';
 import 'package:shop_app/screens/orders.dart';
 import 'package:shop_app/screens/user_products_screen.dart';
 
@@ -23,6 +26,7 @@ class AppDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
     return Drawer(
       child: Column(
         children: [
@@ -38,12 +42,17 @@ class AppDrawer extends StatelessWidget {
           }, context),
           const Divider(),
           _buildListTile('Orders', Icons.payment, () {
-            Navigator.of(context).pushReplacementNamed(OrdersScreen.routeName);
+            Navigator.of(context).pop();
           }, context),
           const Divider(),
           _buildListTile('Manage Product', Icons.settings, () {
             Navigator.of(context)
                 .pushReplacementNamed(UserProductScreen.routeName);
+          }, context),
+          const Divider(),
+          _buildListTile('Log out', Icons.logout_outlined, () {
+            Navigator.of(context).pushReplacementNamed(AuthScreen.routeName);
+            authProvider.logOut();
           }, context),
           const Divider(),
         ],

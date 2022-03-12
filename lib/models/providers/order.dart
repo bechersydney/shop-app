@@ -21,13 +21,24 @@ class Order {
 class OrdersProvider with ChangeNotifier {
   List<Order> _orders = [];
 
+  late String _authToken;
+  late String _userId;
+
+  void updateToken(String token) {
+    _authToken = token;
+  }
+
+  void updateuserId(String userId) {
+    _userId = userId;
+  }
+
   List<Order> get orders {
     return [..._orders];
   }
 
   Future<void> fetchAndSetOrders() async {
     final getOrderUrl = Uri.parse(
-        'https://shop-app-220d9-default-rtdb.firebaseio.com/orders.json');
+        'https://shop-app-220d9-default-rtdb.firebaseio.com/orders/$_userId.json?auth=$_authToken');
     try {
       final response = await http.get(getOrderUrl);
       final extractedData = json.decode(response.body) != null
@@ -67,7 +78,7 @@ class OrdersProvider with ChangeNotifier {
 
   Future<void> addOrder(List<CartItem> cartItems, double total) async {
     final addOrderUrl = Uri.parse(
-        'https://shop-app-220d9-default-rtdb.firebaseio.com/orders.json');
+        'https://shop-app-220d9-default-rtdb.firebaseio.com/orders/$_userId.json?auth=$_authToken'); // this can work and check also for
     final timeStamp = DateTime.now();
 
     try {
@@ -89,7 +100,6 @@ class OrdersProvider with ChangeNotifier {
         }),
       );
       if (response.statusCode >= 400) {
-        print('save order failed!');
       } else {
         _orders.insert(
           0,
@@ -103,7 +113,7 @@ class OrdersProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (err) {
-      throw err;
+      rethrow;
     }
   }
 }

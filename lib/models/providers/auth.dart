@@ -5,9 +5,26 @@ import 'package:shop_app/models/http_exception.dart';
 
 class AuthProvider with ChangeNotifier {
   final String API_KEY = 'AIzaSyAlVKczlPhhj50hvHcukfgIUPInWqzMxv0';
-  var token;
-  var _expiryDate;
-  var userId;
+  String? _token;
+  DateTime? _expiryDate;
+  String? _userId;
+
+  bool get isAuthenticated {
+    return getToken != null;
+  }
+
+  String? get getToken {
+    if (_token != null &&
+        _expiryDate!.isAfter(DateTime.now()) &&
+        _token != null) {
+      return _token;
+    }
+    return null;
+  }
+
+  String? get getuserId {
+    return _userId;
+  }
 
   Future<void> _authenticate(
       {required final String email,
@@ -31,6 +48,14 @@ class AuthProvider with ChangeNotifier {
       if (responseData['error'] != null) {
         throw HttpException(responseData['error']['message']);
       }
+      _token = responseData['idToken'];
+      _userId = responseData['localId'];
+      _expiryDate = DateTime.now().add(
+        Duration(
+          seconds: int.parse(responseData['expiresIn']),
+        ),
+      );
+      notifyListeners();
     } catch (err) {
       rethrow;
     }
@@ -44,5 +69,12 @@ class AuthProvider with ChangeNotifier {
   Future<void> logIn(String email, String password) async {
     return _authenticate(
         email: email, password: password, urlSegment: 'signInWithPassword');
+  }
+
+  void logOut() {
+    _token = null;
+    _userId = null;
+    _expiryDate = null;
+    notifyListeners();
   }
 }

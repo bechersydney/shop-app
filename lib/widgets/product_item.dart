@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop_app/models/providers/auth.dart';
 import 'package:shop_app/models/providers/cart.dart';
 import 'package:shop_app/models/providers/product.dart';
 import 'package:shop_app/screens/product_detail.dart';
@@ -28,6 +29,7 @@ class ProductItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final _product = Provider.of<Product>(context);
+    final _authProvider = Provider.of<AuthProvider>(context);
     final _cartContainer = Provider.of<CartProvider>(context, listen: false);
     return GridTile(
       child: InkWell(
@@ -54,7 +56,10 @@ class ProductItem extends StatelessWidget {
               _product.isFavorite ? Icons.favorite : Icons.favorite_border,
             ),
             () {
-              _product.toggleIsFavorite();
+              _product.toggleIsFavorite(
+                _authProvider.getToken!,
+                _authProvider.getuserId!,
+              );
             },
             context,
           ),

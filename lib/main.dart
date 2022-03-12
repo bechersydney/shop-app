@@ -22,74 +22,89 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-          create: (context) => ProductsProvider(),
-        ),
-        ChangeNotifierProvider(
-          create: (context) => CartProvider(),
-        ),
-        ChangeNotifierProvider(
-          create: (context) => OrdersProvider(),
-        ),
-        ChangeNotifierProvider(
-          create: (context) => AuthProvider(),
-        ),
-      ],
-      child: MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          primaryColor: Colors.purple,
-          fontFamily: 'QuickSand',
-          appBarTheme: AppBarTheme(
-              titleTextStyle: ThemeData.light()
-                  .textTheme
-                  .copyWith(
-                    titleMedium: const TextStyle(
-                      fontFamily: 'QuickSand',
-                      fontSize: 20,
-                      color: Colors.purple,
+        providers: [
+          ChangeNotifierProvider(
+            create: (context) => AuthProvider(), //must be the start
+          ),
+          ChangeNotifierProxyProvider<AuthProvider, ProductsProvider>(
+            create: (context) => ProductsProvider(),
+            update: (ctx, authProvider, previousProduct) {
+              previousProduct!.updateToken(authProvider.getToken ?? '');
+              previousProduct.updateuserId(authProvider.getuserId ?? '');
+              return previousProduct;
+            },
+          ),
+          ChangeNotifierProvider(
+            create: (context) => CartProvider(),
+          ),
+          ChangeNotifierProxyProvider<AuthProvider, OrdersProvider>(
+            create: (context) => OrdersProvider(),
+            update: (ctx, authProvider, previousProvider) {
+              previousProvider!.updateToken(authProvider.getToken!);
+              previousProvider.updateuserId(authProvider.getuserId!);
+              return previousProvider;
+            },
+          ),
+        ],
+        child: Consumer<AuthProvider>(
+          builder: (context, authProvider, child) => MaterialApp(
+            title: 'Flutter Demo',
+            theme: ThemeData(
+              primaryColor: Colors.purple,
+              fontFamily: 'QuickSand',
+              appBarTheme: AppBarTheme(
+                  titleTextStyle: ThemeData.light()
+                      .textTheme
+                      .copyWith(
+                        titleMedium: const TextStyle(
+                          fontFamily: 'QuickSand',
+                          fontSize: 20,
+                          color: Colors.purple,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )
+                      .titleMedium),
+              textTheme: ThemeData.light().textTheme.copyWith(
+                    headline1: const TextStyle(
+                      color: Colors.grey,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
-                  )
-                  .titleMedium),
-          textTheme: ThemeData.light().textTheme.copyWith(
-                headline1: const TextStyle(
-                  color: Colors.grey,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-                labelMedium: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white,
-                ),
-                headline2: const TextStyle(
-                  color: Colors.grey,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 15,
-                ),
+                    labelMedium: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
+                    ),
+                    headline2: const TextStyle(
+                      color: Colors.grey,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 15,
+                    ),
+                  ),
+              colorScheme: ColorScheme.fromSwatch(
+                primarySwatch: Colors.amber,
+              ).copyWith(
+                primary: Colors.amber,
+                secondary: Colors.red,
+                tertiary: Colors.purple,
               ),
-          colorScheme: ColorScheme.fromSwatch(
-            primarySwatch: Colors.amber,
-          ).copyWith(
-            primary: Colors.amber,
-            secondary: Colors.red,
-            tertiary: Colors.purple,
+              // inputDecorationTheme: InputDecorationTheme()
+            ),
+            home: authProvider.isAuthenticated
+                ? const ProductOverviewScreen()
+                : const AuthScreen(),
+            onUnknownRoute: (RouteSettings settings) {
+              return MaterialPageRoute(builder: (ctx) => const AuthScreen());
+            },
+            routes: {
+              AuthScreen.routeName: (_) => const AuthScreen(),
+              ProductDetailScreen.routeName: (_) => const ProductDetailScreen(),
+              CartScreen.routeName: (_) => const CartScreen(),
+              OrdersScreen.routeName: (_) => const OrdersScreen(),
+              UserProductScreen.routeName: (_) => const UserProductScreen(),
+              EditProductScreen.routeName: (_) => const EditProductScreen(),
+            },
           ),
-          // inputDecorationTheme: InputDecorationTheme()
-        ),
-        initialRoute: '/',
-        routes: {
-          '/': (_) => const AuthScreen(),
-          ProductOverviewScreen.routeName: (_) => const ProductOverviewScreen(),
-          ProductDetailScreen.routeName: (_) => const ProductDetailScreen(),
-          CartScreen.routeName: (_) => const CartScreen(),
-          OrdersScreen.routeName: (_) => const OrdersScreen(),
-          UserProductScreen.routeName: (_) => const UserProductScreen(),
-          EditProductScreen.routeName: (_) => const EditProductScreen(),
-        },
-      ),
-    );
+        ));
   }
 }

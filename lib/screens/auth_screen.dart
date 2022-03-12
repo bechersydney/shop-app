@@ -86,6 +86,7 @@ class AuthScreen extends StatelessWidget {
 }
 
 class AuthCard extends StatefulWidget {
+  
   const AuthCard({
     Key? key,
   }) : super(key: key);
@@ -145,7 +146,7 @@ class _AuthCardState extends State<AuthCard> {
         await Provider.of<AuthProvider>(context, listen: false).signUp(
             _authData['email'].toString(), _authData['password'].toString());
       }
-    } on HttpException catch (err) {
+    } on HttpException {
       const message = 'Authentication Failed';
       _showDialog(message);
     } catch (err) {
@@ -210,6 +211,7 @@ class _AuthCardState extends State<AuthCard> {
                     if (value!.isEmpty || value.length < 5) {
                       return 'Password is too short!';
                     }
+                    return null;
                   },
                   onSaved: (value) {
                     _authData['password'] = value!;
@@ -226,6 +228,7 @@ class _AuthCardState extends State<AuthCard> {
                             if (value != _passwordController.text) {
                               return 'Passwords do not match!';
                             }
+                            return null;
                           }
                         : null,
                   ),
