@@ -10,6 +10,7 @@ import 'package:shop_app/screens/edit_product.dart';
 import 'package:shop_app/screens/orders.dart';
 import 'package:shop_app/screens/product_detail.dart';
 import 'package:shop_app/screens/product_overview.dart';
+import 'package:shop_app/screens/splash_screen.dart';
 import 'package:shop_app/screens/user_products_screen.dart';
 
 void main() {
@@ -92,7 +93,19 @@ class MyApp extends StatelessWidget {
             ),
             home: authProvider.isAuthenticated
                 ? const ProductOverviewScreen()
-                : const AuthScreen(),
+                : FutureBuilder(
+                    future: authProvider.tryAutoLogin(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        if (snapshot.hasError) {
+                          return const Center(child: Text('Error Occured!'));
+                        }
+                        return const AuthScreen();
+                      } else {
+                        return const SplashScreen();
+                      }
+                    },
+                  ),
             onUnknownRoute: (RouteSettings settings) {
               return MaterialPageRoute(builder: (ctx) => const AuthScreen());
             },

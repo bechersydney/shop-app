@@ -51,7 +51,7 @@ class AppDrawer extends StatelessWidget {
           }, context),
           const Divider(),
           _buildListTile('Log out', Icons.logout_outlined, () {
-            Navigator.of(context).pushReplacementNamed(AuthScreen.routeName);
+            Navigator.of(context).pushReplacementNamed('/');
             authProvider.logOut();
           }, context),
           const Divider(),
