@@ -26,37 +26,43 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         ),
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            SizedBox(
-              height: 300,
-              width: double.infinity,
-              child: Image.network(
-                product.imageUrl,
-                fit: BoxFit.cover,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              SizedBox(
+                height: 300,
+                width: double.infinity,
+                child: Hero(
+                  tag: product.id,
+                  child: Image.network(
+                    product.imageUrl,
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Text(
-              '\$${product.price}',
-              style: Theme.of(context).textTheme.headline1,
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Container(
-              padding: const EdgeInsets.all(
-                10,
+              const SizedBox(
+                height: 10,
               ),
-              child: Text(
-                product.description,
-                style: const TextStyle(fontSize: 16),
-                softWrap: true,
+              Text(
+                '\$${product.price}',
+                style: Theme.of(context).textTheme.headline1,
               ),
-            ),
-          ],
+              const SizedBox(
+                height: 10,
+              ),
+              Container(
+                padding: const EdgeInsets.all(
+                  10,
+                ),
+                child: Text(
+                  product.description,
+                  style: const TextStyle(fontSize: 16),
+                  softWrap: true,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -33,12 +33,16 @@ class ProductItem extends StatelessWidget {
     final _cartContainer = Provider.of<CartProvider>(context, listen: false);
     return GridTile(
       child: InkWell(
-        onTap: () => _navitageToDetailScreen(context, _product.id),
-        child: Image.network(
-          _product.imageUrl,
-          fit: BoxFit.cover,
-        ),
-      ),
+          onTap: () => _navitageToDetailScreen(context, _product.id),
+          child: Hero(
+            tag: _product.id,
+            child: FadeInImage(
+              placeholder:
+                  const AssetImage('assets/images/product-placeholder.png'),
+              image: NetworkImage(_product.imageUrl),
+              fit: BoxFit.cover,
+            ),
+          )),
       footer: GridTileBar(
         backgroundColor: Colors.black54,
         title: FittedBox(
