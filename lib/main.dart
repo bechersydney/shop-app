@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop_app/helpers/custom_route.dart';
 import 'package:shop_app/models/providers/auth.dart';
 import 'package:shop_app/models/providers/cart.dart';
 import 'package:shop_app/models/providers/order.dart';
@@ -41,8 +42,8 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProxyProvider<AuthProvider, OrdersProvider>(
             create: (context) => OrdersProvider(),
             update: (ctx, authProvider, previousProvider) {
-              previousProvider!.updateToken(authProvider.getToken!);
-              previousProvider.updateuserId(authProvider.getuserId!);
+              previousProvider!.updateToken(authProvider.getToken ?? '');
+              previousProvider.updateuserId(authProvider.getuserId ?? '');
               return previousProvider;
             },
           ),
@@ -51,6 +52,11 @@ class MyApp extends StatelessWidget {
           builder: (context, authProvider, child) => MaterialApp(
             title: 'Flutter Demo',
             theme: ThemeData(
+              // add route aniamtion to all pagess
+              pageTransitionsTheme: PageTransitionsTheme(builders: {
+                TargetPlatform.android: CustomPageTransitionBuilder(),
+                TargetPlatform.iOS: CustomPageTransitionBuilder(),
+              }),
               primaryColor: Colors.purple,
               fontFamily: 'QuickSand',
               appBarTheme: AppBarTheme(

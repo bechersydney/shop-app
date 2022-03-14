@@ -17,32 +17,39 @@ class _OrderItemState extends State<OrderItem> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.all(10),
-      child: Column(
-        children: [
-          ListTile(
-            title: Text(
-              '\$${widget.order.amount.toStringAsFixed(2)}',
-            ),
-            subtitle: Text(
-              DateFormat.yMMMMEEEEd().format(widget.order.dateTime),
-            ),
-            trailing: IconButton(
-              icon: Icon(
-                _isExpanded ? Icons.expand_less : Icons.expand_more,
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      height: _isExpanded
+          ? min(widget.order.cartItems.length * 20 + 200, 250)
+          : 105,
+      child: Card(
+        margin: const EdgeInsets.all(10),
+        child: Column(
+          children: [
+            ListTile(
+              title: Text(
+                '\$${widget.order.amount.toStringAsFixed(2)}',
               ),
-              onPressed: () {
-                setState(() {
-                  _isExpanded = !_isExpanded;
-                });
-              },
+              subtitle: Text(
+                DateFormat.yMMMMEEEEd().format(widget.order.dateTime),
+              ),
+              trailing: IconButton(
+                icon: Icon(
+                  _isExpanded ? Icons.expand_less : Icons.expand_more,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _isExpanded = !_isExpanded;
+                  });
+                },
+              ),
             ),
-          ),
-          if (_isExpanded)
-            Container(
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
               padding: const EdgeInsets.all(8),
-              height: min(widget.order.cartItems.length * 20 + 100, 180),
+              height: _isExpanded
+                  ? min(widget.order.cartItems.length * 20 + 100, 350)
+                  : 0,
               child: ListView.builder(
                 itemBuilder: (context, index) => Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -73,7 +80,8 @@ class _OrderItemState extends State<OrderItem> {
                 itemCount: widget.order.cartItems.length,
               ),
             )
-        ],
+          ],
+        ),
       ),
     );
   }

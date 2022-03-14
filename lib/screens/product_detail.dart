@@ -20,50 +20,53 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       listen: false, // do not listen if notifylistener is called
     ).getProductById(productId);
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          product.title,
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              SizedBox(
-                height: 300,
-                width: double.infinity,
-                child: Hero(
-                  tag: product.id,
-                  child: Image.network(
-                    product.imageUrl,
-                    fit: BoxFit.cover,
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 300,
+            pinned: true,
+            flexibleSpace: FlexibleSpaceBar(
+              title: Text(product.title),
+              background: Hero(
+                tag: product.id,
+                child: Image.network(
+                  product.imageUrl,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
+          SliverList(
+            delegate: SliverChildListDelegate(
+              [
+                const SizedBox(
+                  height: 10,
+                ),
+                Center(
+                  child: Text(
+                    '\$${product.price}',
+                    style: Theme.of(context).textTheme.headline1,
                   ),
                 ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Text(
-                '\$${product.price}',
-                style: Theme.of(context).textTheme.headline1,
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              Container(
-                padding: const EdgeInsets.all(
-                  10,
+                const SizedBox(
+                  height: 10,
                 ),
-                child: Text(
-                  product.description,
-                  style: const TextStyle(fontSize: 16),
-                  softWrap: true,
+                Container(
+                  padding: const EdgeInsets.all(
+                    10,
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    product.description,
+                    style: const TextStyle(fontSize: 16),
+                    softWrap: true,
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 600),
+              ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

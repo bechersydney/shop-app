@@ -42,7 +42,7 @@ class AppDrawer extends StatelessWidget {
           }, context),
           const Divider(),
           _buildListTile('Orders', Icons.payment, () {
-            Navigator.of(context).pop();
+            Navigator.of(context).pushReplacementNamed(OrdersScreen.routeName);
           }, context),
           const Divider(),
           _buildListTile('Manage Product', Icons.settings, () {
